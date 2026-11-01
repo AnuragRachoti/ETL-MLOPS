@@ -20,7 +20,9 @@ needed for this file to configure setuptools.
 '''
 
 
-from setuptools import setup, find_packages 
+from pathlib import Path
+
+from setuptools import setup, find_packages
 from typing import List
 
 def get_requirements(file_path: str) -> List[str]:
@@ -33,17 +35,18 @@ def get_requirements(file_path: str) -> List[str]:
     Returns:
         List[str]: A list of requirement strings.
     """
-    with open('requirements.txt', "r") as f:
-        return [line.strip() if line != '-e .' else line.strip() for line in f if line.strip()]
+    requirements_path = Path(__file__).resolve().parent / file_path
+    with requirements_path.open(encoding="utf-8") as f:
+        return [
+            line.strip()
+            for line in f
+            if line.strip()
+            and not line.lstrip().startswith("#")
+            and line.strip() != "-e ."
+        ]
 
 
-
-    setup(
-        name="mlops-pipeline",
-        version="0.1.0",
-        description="A machine learning operations (MLOps) pipeline project.",
-        author="Anurag Rachoti",
-        author_email="anuragrachoti@gmail.com",
-        packages=find_packages(),
-        install_requires=get_requirements('requirements.txt')
-    )
+setup(
+    packages=find_packages(include=["networksecurity", "networksecurity.*"]),
+    install_requires=get_requirements("requirements.txt"),
+)
